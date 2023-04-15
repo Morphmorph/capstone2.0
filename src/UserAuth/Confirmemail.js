@@ -1,35 +1,43 @@
 import React, { useState } from "react";
-import TextField from '@mui/material/TextField';
-import{FaFacebook,FaGoogle, FaTwitter} from 'react-icons/fa';
-import { Link,} from 'react-router-dom';
+import { TextField } from '@mui/material/';
+import { Link, useNavigate} from 'react-router-dom';
+import MenuItem from '@mui/material/MenuItem';
 import 'animate.css'
-
+import { PropagateLoader} from "react-spinners";
+import { useForm } from 'react-hook-form'
 export default function Confirmemail  () {
  
-  const [email, setEmail] = useState("");
+  const { register, handleSubmit, formState: { errors }, watch} = useForm();
+  const navigate = useNavigate();
+
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRedirect, setIsRedirect] = useState(false);
   
-  const [emailError, setEmailError] = useState("");
- 
-
   
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!email) {
-      setEmailError(true);
-    } else {
-      setEmailError(false);
-    }
-
-   
-    // submit form if no errors
-    if (email) {
-      console.log("submitted");
+  const onSubmit = async (data, event) => {
+    event.preventDefault(); 
+    console.log(data);
+    setIsLoading(true); // Set isLoading to true when form is submitted
+    try {
+      // Perform form submission logic here
+      console.log(data);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      setIsRedirect(true);
+       // Set redirect state to true after form submission is successful
+       navigate('/');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false); // Set isLoading back to false after form submission is completed
     }
   };
 
 return(
-<div className="flex w-full h-screen esm:pt-10 pt-24 " >
+
+  <form onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex w-full h-screen esm:pt-10 pt-24 " >
     <div className="w-full flex items-center justify-center lg:w-1/2 bg-white-100 esm:px-0 px-2 ">
     <div className=' 
     lg:border-2 lg:px-10 lg:pt-10 lg:pb-10 lg:rounded-3xl lg:text-center 
@@ -41,23 +49,41 @@ return(
     '> 
     <h1 className=' text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 '>Verify</h1>
     <p>Please<span className=' font-bold'> provide</span> your valid email address to continue </p>
-    <form>
+    
     <div className=' w-full esm:px-0 px-5 '>
-      <div className='py-5 relative'>
+    <div className='py-5'>
+    <TextField 
+            id="email" 
+            label="Email" 
+            variant="outlined" 
+            fullWidth
+            name="email"
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                message: 'Invalid email address', // Custom error message for invalid email format
+              },
+            })}
+            error={!!errors.email} // Set error state based on validation result
+            helperText={errors.email ? errors.email.message : null} // Display validation error message
+           
+
+        /> 
       
-      <TextField id="outlined-basic" label="Email" variant="outlined" type={'email'} value={email} onChange={(e) => setEmail(e.target.value)} 
-      required
-      error={emailError}
-      helperText={emailError && "Please enter a valid email address"}
-      style={{width: '100%'}}/>
-      </div>
-     
+        </div>
     </div>
-    </form>
     
     <div className='mt-4 gap-y-4 justify-center text-center  w-full esm:px-0 px-5'>
-    <button type="submit" className=' active:scale-[.98] active:duration-75 translate-all hover:scale-[1.01] ease-in-out bg-blue-600 text-white px-20 py-2 rounded-md 'style={{width: '100%'}} onClick={handleSubmit}>Login</button>
-      
+    <button className=' active:scale-[.98] active:duration-75 translate-all hover:scale-[1.01] ease-in-out bg-blue-600 text-white px-20 py-2 rounded-md 
+    'style={{width: '100%'}} 
+    type="submit"
+    disabled={isLoading}>{isLoading ? 'Sending verification...' : 'Send verification'}</button>
+     {isLoading && (
+      <div className=" rounded-2xl absolute top-0 left-0 right-5 bottom-0 flex items-center justify-center bg-white opacity-75 z-10">
+      <PropagateLoader color="black" loading={true} size={15}/> 
+    </div>
+      )} 
       <Link to="/register"><button className="font-medium text-indigo-600 hover:text-indigo-500 mt-5" > Cancel</button></Link>
     </div>
   
@@ -65,6 +91,7 @@ return(
     </div>
     </div>
     </div>
+    </form>
   );
 };
 
