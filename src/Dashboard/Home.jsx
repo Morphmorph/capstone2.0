@@ -2,6 +2,7 @@ import React,{ useState,useEffect } from 'react'
 import { Link, useNavigate} from 'react-router-dom';
 import { PropagateLoader} from "react-spinners";
 import Appbar from './Appbar'
+import Avatar from '@mui/material/Avatar';
 import UserContext from '../api/context/context';
 import { axiosRequest } from '../api/api/axios';
 import { useForm } from 'react-hook-form'
@@ -29,14 +30,14 @@ useEffect(() => {
       
       //  console.log(profile)
 
-      setProfile(response.data)
+      setProfile(response?.data || response.data)
       if (user.usertype === "Student") {
-        if (response.data[0].userdetails.length == 0) {
+        if (response.data[0].userdetails.length === 0) {
           navigate('/personal');
           
-        } else if (response.data[0].guardian.length == 0) {
+        } else if (response.data[0].guardian.length === 0) {
           navigate('/Sguardian');
-        } else if (response.data[0].educationbg.length == 0) {
+        } else if (response.data[0].educationbg.length === 0) {
           navigate('/Seducation');
         } else {
           navigate('/home');
@@ -46,6 +47,7 @@ useEffect(() => {
           navigate('/personal');
         } else {
           navigate('/home');
+          console.log(response.data[0].userdetails.length)
         }
       }
     } catch (err) {
@@ -82,7 +84,7 @@ const onSubmit = async (data, event) => {
     {profile.map((profile,index)=>(  <div key={index} className=' w-full bg-[#EDF3FF96] rounded-lg'>
 
         
-        <h1 className=' text-3xl p-5'>  {profile.usertype} Profile</h1>
+        <h1 className=' text-3xl p-5' style={{textAlign:"center"}}>  {profile.usertype} </h1>
         <div className=" w-full flex items-center justify-center">
      <div  className=' 
     lg:border-2 lg:px-10 lg:pt-10 lg:pb-10 lg:rounded-3xl lg:text-center 
@@ -92,11 +94,26 @@ const onSubmit = async (data, event) => {
     eesm:border-2 eesm:px-1 eesm:pt-4 eesm:pb-10 eesm:rounded-xl
     animate__animated animate__bounceInLeft  bg-white
     '> 
-    <h1 className=' text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 '>Logout</h1>
-    <p >Complete your account verification and join our community of trusted users.</p>
-   
-    <div className=' w-full esm:px-0 px-5 '>
 
+<div className=' w-full esm:px-10 px-5 ' style={{ display: "flex",
+  justifyContent: "center",
+  alignItems: "center",}}>
+<Avatar
+        alt="Remy Sharp"
+        src="/static/images/avatar/1.jpg"
+        sx={{ width: 100, height:100,opacity: "0.5" ,backgroundColor:"Highlight",textTransform:"capitalize"}}>{profile.userdetails.length !=0 ? profile.userdetails[0].first_name[0] + profile.userdetails[0].last_name[0]   : null }</Avatar>
+    </div>
+
+   {  profile.userdetails.length != 0 ? <> <h1 className=' text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 '>{profile.userdetails[0].last_name} {profile.userdetails[0].first_name} {profile.userdetails[0].mid_name}</h1>
+    <p>Fullname</p> </> : null}
+   
+   <div className=' w-full esm:px-0 px-5 '>
+{ profile.address.length != 0 ? <><h1 className=' text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 '>{profile.address[0].street} {profile.address[0].city} {profile.address[0].province} {profile.address[0].zipcode}</h1>
+    <p >Address</p> </> : null}
+    </div>
+    <div className=' w-full esm:px-0 px-5 '>
+<h1 className=' text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 '>{profile.email} </h1>
+    <p >Email</p>
     </div>
     <form onSubmit={handleSubmit(onSubmit)}>
     <div className='mt-4 gap-y-4 justify-center text-center  w-full esm:px-0 px-5'>
