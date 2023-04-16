@@ -5,7 +5,10 @@ import 'animate.css';
 import Register from './UserAuth/Register';
 import Confirmemail from './UserAuth/Confirmemail';
 import Home from './Dashboard/Home';
-import Personal from './Add info/Employer/Personal';
+import Personal from './UserAuth/Personal';
+import Company from './Add info/Employer/Company';
+import Guardian from './Add info/Student/Guardian';
+import Education from './Add info/Student/Education';
 
 
 function App() {
@@ -28,11 +31,15 @@ function App() {
 </div>
     <div>
     <Routes>
-        <Route index element={<Personal />} />
+        <Route index element={<Login />} />
+        <Route path="register" element={<Register/>} />
         <Route path="confirmemail" element={<Confirmemail/>} />
         <Route path="home" element={<Home/>} />
-        <Route path="Epersonal" element={<Login/>} />
-        <Route path="register" element={<Register/>} />
+        <Route path="personal" element={<Personal/>} />
+        <Route path="Ecompany" element={<Company/>} />
+        <Route path="Sguardian" element={<Guardian/>} />
+        <Route path="Seducation" element={<Education/>} />
+        
       </Routes>
   
   
