@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect} from "react";
 import { TextField } from '@mui/material/';
 import { Link, useNavigate} from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,30 +10,66 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import{FaFacebook,FaGoogle, FaTwitter} from 'react-icons/fa';
-
+import { axiosRequest } from "../api/api/axios";
+import UserContext from "../api/context/context";
 
 export default function Login  () {
  
   const { register, handleSubmit, formState: { errors }, watch} = useForm();
   const navigate = useNavigate();
 
+ 
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirect, setIsRedirect] = useState(false);
   
   
+  const {setUser} = React.useContext(UserContext)
+  const { user } = React.useContext(UserContext);
+  
+
+  useEffect(() => {
+  // if(user.access){
+  //   navigate('/home')
+  // }else{
+  //   navigate('/')
+  // }
+  }, [user.access]);
+  
   const onSubmit = async (data, event) => {
     event.preventDefault(); 
     console.log(data);
+    var Data ={
+      email:data.email,
+      password:data.password
+    }
     setIsLoading(true); // Set isLoading to true when form is submitted
     try {
       // Perform form submission logic here
       console.log(data);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      setIsRedirect(true);
-       // Set redirect state to true after form submission is successful
-       navigate('/personal');
+      await axiosRequest.post('auth/api/jwt/create/',JSON.stringify(Data),{ headers: {
+        'Content-Type': 'application/json'
+      }}).then((response)=>{
+        console.log(response.status)
+        axiosRequest.get('auth/api/users/me/',{headers:{
+          'Authorization': `JWT ${ response.data.access}`,
+        }}).then(res=>{
+          setUser({usertype:res.data.usertype,id:res.data.id,email:res.data.email,access:response.data.access})
+          //   alert("Account Verified Ready To Login!")
+          //   navigate("studentpage")
+          new Promise(resolve => setTimeout(resolve, 5000));
+          setIsRedirect(true);
+           // Set redirect state to true after form submission is successful
+           navigate('/home');
+        })
+    
+      }).catch((err)=>{
+        // console.log(err.request.status)
+            alert("Unauthorized Account")
+            setUser({usertype:null,id:null,email:null,access:null})
+          
+      })
+ 
     } catch (error) {
       console.error(error);
     } finally {
@@ -71,7 +107,7 @@ export default function Login  () {
     return true;
   };
   
-
+// console.log(user)
 return(
   <form onSubmit={handleSubmit(onSubmit)}>
     <div className="flex w-full h-screen esm:pt-10 " >
