@@ -5,19 +5,21 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
+import TextField from '@mui/material/TextField';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+import profileImage from '../Images/profile.png'
+const pages = ['Home', 'Bookmarks', 'Activity log',];
+const settings = ['Profile', 'Account', 'Logout'];
 
 function Appbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [activePage, setActivePage] = React.useState(pages[0]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -34,11 +36,15 @@ function Appbar() {
     setAnchorElUser(null);
   };
 
+  const handlePageClick = (page) => {
+    setActivePage(page);
+  };
+
   return (
-    <AppBar position="absolute" style={{backgroundColor: 'inherit', display: 'flex', zIndex: 1, }}>
+    <AppBar position="absolute" style={{backgroundColor: '#1e1e1e', display: 'flex', zIndex: 1, }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'yellow' }} />
           <Typography
             variant="h6"
             noWrap
@@ -50,14 +56,15 @@ function Appbar() {
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
+              color: 'white',
+              textDecoration: 'none', 
+            }} 
           >
-            HANAPP
+            <span>HAN</span><span className=' text-blue-600'>APP</span>
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -87,47 +94,78 @@ function Appbar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handlePageClick(page)}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            HANAPP
-          </Typography>
+  
+          
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+              key={page}
+              color={activePage === page ? 'secondary' : 'inherit'}
+              onClick={() => handlePageClick(page)}
+              sx={{
+                my: 1,
+                color: 'white',
+                display: 'block',
+                borderRadius: 0,
+                '&:hover': {
+                  color: 'yellow',
+                  
+                },
+                ...(activePage === page && {
+                  color: 'yellow',
+                  borderBottom: '3px solid yellow'
+                })
+              }}
               >
                 {page}
               </Button>
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0, }}>
+          <div className=' flex items-center'>
+          <TextField
+            id="search-bar"
+            label="Search"
+            variant="outlined"
+            fullWidth
+            size="small"
+            InputLabelProps={{
+              style: {
+                color: 'white' // change the color to whatever you want
+              }
+            }}
+            InputProps={{
+              style: {
+                color: 'white'
+              }
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'white',
+                  color: 'white'
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white',
+                },
+              },
+              mr: 2,
+            }}
+          />
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <img  src={profileImage} alt='profile' style={{ width: '50px', height: '50px', borderRadius: '25px' }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -152,6 +190,7 @@ function Appbar() {
                 </MenuItem>
               ))}
             </Menu>
+            </div>
           </Box>
         </Toolbar>
       </Container>

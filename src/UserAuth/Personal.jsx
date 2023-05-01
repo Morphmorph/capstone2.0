@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { TextField } from '@mui/material/';
 import { useNavigate} from 'react-router-dom';
 import 'animate.css'
 import { PropagateLoader} from "react-spinners";
 import { useForm } from 'react-hook-form'
-
-
+import UserContext from "../api/context/context";
+import { axiosRequest } from "../api/api/axios";
 
 export default function Personal () {
   const { register, handleSubmit, clearErrors, setError, formState: { errors },} = useForm();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
   const [age, setAge] = useState('');
-
+  
+  const { user } = React.useContext(UserContext);
   
   const handleDateChange = (event) => {
     const dateValue = event.target.value;
@@ -41,9 +42,38 @@ export default function Personal () {
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirect, setIsRedirect] = useState(false);
   
+
+
+  
+    //  if(user.access != null) {
+    //     navigate('/')
+    //     console.log(user)
+    //   }
+  
   
   const onSubmit = async (data, event) => {
     event.preventDefault(); 
+    var Data ={
+  
+      first_name:data.first_name,
+      last_name:data.last_name,
+      mid_name:data.mid_name,
+      suff_name:data.suff_name ,
+      birthday:data.date,
+      age:age,
+      contact_no:data.phone,
+      user: user.id
+        };
+
+        var Address = {
+
+          user:user.id,
+          street:data.street ,
+          city:data.city,
+          province:data.province ,
+          zipcode:data.zipcode,
+        
+        }
     if (age <= 18) {
       // If age is not greater than 18, display an error message
       setError('date', {
@@ -55,13 +85,41 @@ export default function Personal () {
     console.log(data);
     setIsLoading(true); // Set isLoading to true when form is submitted
     try {
-      // Perform form submission logic here
-      console.log(data);
+    console.log(Data)
+
+     await  axiosRequest.post('auth/userdetails/', JSON.stringify(Data), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `JWT ${ user.access}`,
+        }
+      }).then((response) => {
+              console.log(response.data)
+            axiosRequest.post('auth/address/',JSON.stringify(Address),{
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `JWT ${ user.access}`,
+              }
+            }).then((res)=>{
+              // Perform form submission logic here
+               console.log(res.data);
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      setIsRedirect(true);
+               new Promise(resolve => setTimeout(resolve, 3000));
+                setIsRedirect(true);
        // Set redirect state to true after form submission is successful
-       navigate('/Ecompany');
+              if(user.usertype === "Student"){
+              navigate('/Seducation')
+              }else{
+            navigate('/Ecompany');
+          }
+            }).catch((err)=>{
+              alert("this Error in User Adress")
+            })
+            }).catch((err)=>{
+              alert("this Error in User Deatails")
+              console.log(Data)
+            })
+
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -71,7 +129,7 @@ export default function Personal () {
   
  
   
-  
+  console.log(user)
   return(
 
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -91,12 +149,12 @@ export default function Personal () {
       
       <div className='pb-5 w-full'>
           <TextField 
-            id="fname" 
-            label="Full name" 
+            id="last_name" 
+            label="Last Name" 
             variant="outlined" 
             fullWidth
-            name="fname"
-            {...register('fname', {
+            name="last_name"
+            {...register('last_name', {
               required: 'This field is required',
               maxLength: {
                 value: 30,
@@ -112,13 +170,97 @@ export default function Personal () {
               },
              
             })}
-            error={!!errors.fname} // Set error state based on validation result
-            helperText={errors.fname ? errors.fname.message : null} // Display validation error message
+            error={!!errors.last_name} // Set error state based on validation result
+            helperText={errors.last_name ? errors.last_name.message : null} // Display validation error message
+          
+
+        /> 
+        </div>
+        <div className='pb-5 w-full'>
+         <TextField 
+            id="first_name" 
+            label="First Name" 
+            variant="outlined" 
+            fullWidth
+            name="first_name"
+            {...register('first_name', {
+              required: 'This field is required',
+              maxLength: {
+                value: 30,
+                message: 'Name exceeded the limit!',
+              },
+              minLength: {
+                value: 2,
+                message: 'Name should be greater than one ',
+              },
+              pattern: {
+                value: /^[^0-9]*$/,
+                message: 'Please provide a valid name (letters only)', // Custom error message for invalid email format
+              },
+             
+            })}
+            error={!!errors.first_name} // Set error state based on validation result
+            helperText={errors.first_name ? errors.first_name.message : null} // Display validation error message
           
 
         /> 
        
         </div>
+
+        <div className='pb-5 w-full'>
+         <TextField 
+            id="mid_name" 
+            label="Middle Name" 
+            variant="outlined" 
+            fullWidth
+            name="mid_name"
+            {...register('mid_name', {
+              required: 'This field is required',
+              maxLength: {
+                value: 30,
+                message: 'Name exceeded the limit!',
+              },
+              minLength: {
+                value: 2,
+                message: 'Name should be greater than one ',
+              },
+              pattern: {
+                value: /^[^0-9]*$/,
+                message: 'Please provide a valid name (letters only)', // Custom error message for invalid email format
+              },
+             
+            })}
+            error={!!errors.mid_name} // Set error state based on validation result
+            helperText={errors.mid_name ? errors.mid_name.message : null} // Display validation error message
+          
+
+        /> 
+       
+        </div>
+
+        <div className='pb-5 w-full'>
+         <TextField 
+            id="suff_name" 
+            label="Suffix Name(if Applicable)" 
+            variant="outlined" 
+            fullWidth
+            name="suff_name"
+            {...register('suff_name', {
+              minLength: {
+                value: 2,
+                message: 'Name should be greater than one ',
+              },
+              pattern: {
+                value: /^[^0-9]*$/,
+                message: 'Please provide a valid name (letters only)', // Custom error message for invalid email format
+              },
+             
+            })}
+         
+        /> 
+       
+        </div>
+
        <div className="pb-5 w-full">
        <TextField
         label="Date of Birth"
@@ -145,7 +287,7 @@ export default function Personal () {
        <TextField
         label="Age"
         value={age}
-        disabled
+        // disabled
         fullWidth
         InputProps={{
           inputProps: {

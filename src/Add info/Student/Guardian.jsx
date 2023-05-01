@@ -4,6 +4,8 @@ import { useNavigate} from 'react-router-dom';
 import 'animate.css'
 import { PropagateLoader} from "react-spinners";
 import { useForm } from 'react-hook-form'
+import UserContext from "../../api/context/context";
+import { axiosRequest } from "../../api/api/axios";
 
 
 
@@ -14,29 +16,30 @@ export default function Guardian () {
   const [gage, setAge] = useState('');
 
   
-  const handleDateChange = (event) => {
-    const dateValue = event.target.value;
-    if (dateValue) {
-    const gdate = new Date(event.target.value);
+  const { user } = React.useContext(UserContext);
+  // const handleDateChange = (event) => {
+  //   const dateValue = event.target.value;
+  //   if (dateValue) {
+  //   const gdate = new Date(event.target.value);
     
 
     
-      setSelectedDate(gdate ? new Date(gdate) : null);
-    const today = new Date();
-    const birthDate = new Date(gdate);
-    const yearsDifference = today.getFullYear() - birthDate.getFullYear();
-    const isBeforeBirthday =
-      today.getMonth() < birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() < birthDate.getDate());
-    const gage = isBeforeBirthday ? yearsDifference - 1 : yearsDifference;
-    setAge(gage);
-    clearErrors('gdate');
-  } else {
-    setSelectedDate(null);
-    setAge('');
-  }
-  };
+  //     setSelectedDate(gdate ? new Date(gdate) : null);
+  //   const today = new Date();
+  //   const birthDate = new Date(gdate);
+  //   const yearsDifference = today.getFullYear() - birthDate.getFullYear();
+  //   const isBeforeBirthday =
+  //     today.getMonth() < birthDate.getMonth() ||
+  //     (today.getMonth() === birthDate.getMonth() &&
+  //       today.getDate() < birthDate.getDate());
+  //   const gage = isBeforeBirthday ? yearsDifference - 1 : yearsDifference;
+  //   setAge(gage);
+  //   clearErrors('gdate');
+  // } else {
+  //   setSelectedDate(null);
+  //   setAge('');
+  // }
+  // };
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirect, setIsRedirect] = useState(false);
@@ -44,14 +47,28 @@ export default function Guardian () {
   
   const onSubmit = async (data, event) => {
     event.preventDefault(); 
-    if (gage <= 18) {
-      // If age is not greater than 18, display an error message
-      setError('gdate', {
-        type: 'manual',
-        message: 'Guardian should be 18+ years old!',
-      });
-      return;
-    }
+    // if (gage <= 18) {
+    //   // If age is not greater than 18, display an error message
+    //   setError('gdate', {
+    //     type: 'manual',
+    //     message: 'Guardian should be 18+ years old!',
+    //   });
+    //   return;
+    // }
+
+    var Data ={
+      g_name:data.g_name,
+      g_contact_no:data.g_contact_no,
+      g_address:data.g_address,
+      user:user.id
+    };
+
+    var headers = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `JWT ${ user.access}`,
+      }
+    };
     console.log(data);
     setIsLoading(true); // Set isLoading to true when form is submitted
     try {
@@ -61,7 +78,21 @@ export default function Guardian () {
       await new Promise(resolve => setTimeout(resolve, 3000));
       setIsRedirect(true);
        // Set redirect state to true after form submission is successful
-       navigate('/Seducation');
+       navigate('/home');
+
+       await axiosRequest.post('auth/guardian/', JSON.stringify(Data), headers)  
+       .then((response) => {
+        console.log(response.data);
+        // Simulate API call
+         new Promise(resolve => setTimeout(resolve, 3000));
+        setIsRedirect(true);
+         // Set redirect state to true after form submission is successful
+         navigate('/home');
+  
+       }).catch((err)=>{
+         alert(err.status)
+       })
+       
     } catch (error) {
       console.error(error);
     } finally {
@@ -91,12 +122,12 @@ export default function Guardian () {
       
       <div className='pb-5 w-full'>
           <TextField 
-            id="gname" 
+            id="g_name" 
             label="Full name" 
             variant="outlined" 
             fullWidth
-            name="gname"
-            {...register('gname', {
+            name="g_name"
+            {...register('g_name', {
               required: 'This field is required',
               maxLength: {
                 value: 30,
@@ -112,14 +143,14 @@ export default function Guardian () {
               },
              
             })}
-            error={!!errors.gname} // Set error state based on validation result
-            helperText={errors.gname ? errors.gname.message : null} // Display validation error message
+            error={!!errors.g_name} // Set error state based on validation result
+            helperText={errors.g_name ? errors.g_name.message : null} // Display validation error message
           
 
         /> 
        
         </div>
-       <div className="pb-5 w-full">
+       {/* <div className="pb-5 w-full">
        <TextField
         label="Date of Birth"
         type="date"
@@ -156,51 +187,51 @@ export default function Guardian () {
         error={gage < 18}
         helperText={gage < 18 ? "Guardian should be at least 18 years old" : ''}
       />
-      </div>
+      </div> */}
       <div className='pb-5 w-full'>
         <TextField
-      id="phone"
+      id="g_contact_no"
       label="Phone Number"
       variant="outlined"
       fullWidth
       type="tel"
-      name="phone"
-      {...register('phone', {
+      name="g_contact_no"
+      {...register('g_contact_no', {
         required: 'This field is required',
         pattern: {
           value: /^(\+)?\d{10,14}$/,
-          message: 'Please provide a valid phone number', // Custom error message for invalid phone number format
+          message: 'Please provide a valid phone number', // Custom error message for invalid g_contact_no number format
         },
       })}
-      error={!!errors.phone} // Set error state based on validation result
-      helperText={errors.phone ? errors.phone.message : null} // Display validation error message
+      error={!!errors.g_contact_no} // Set error state based on validation result
+      helperText={errors.g_contact_no ? errors.g_contact_no.message : null} // Display validation error message
     />
        
 
         </div>
         <div className='pb-5 w-full'>
         <TextField
-        id="street"
-        label="Street"
+        id="g_address"
+        label="Complete Address"
         variant="outlined"
         fullWidth
-        name="street"
-        {...register('street',{
+        name="g_address"
+        {...register('g_address',{
           required: 'This field is required',
-          maxLength: {
-            value: 20,
-            message: 'Exceeded the limit!',
-          },
-          pattern: {
-            value: /^[^0-9]*$/,
-            message: 'Please provide a valid street (letters only)', // Custom error message for invalid email format
-          },
+          // maxLength: {
+          //   value: 20,
+          //   message: 'Exceeded the limit!',
+          // },
+          // pattern: {
+          //   value: /^[^0-9]*$/,
+          //   message: 'Please provide a valid g_address (letters only)', // Custom error message for invalid email format
+          // },
         })}
-        error={!!errors.street}
-        helperText={errors.street ? errors.street.message : null}
+        error={!!errors.g_address}
+        helperText={errors.g_address ? errors.g_address.message : null}
       />
       </div>
-      <div className='pb-5 w-full'>
+      {/* <div className='pb-5 w-full'>
       <TextField
         id="city"
         label="City"
@@ -263,7 +294,7 @@ export default function Guardian () {
       />
        
        
-        </div>
+        </div> */}
       
       </div>
       <div className=" pt-5">

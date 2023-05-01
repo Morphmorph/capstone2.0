@@ -1,17 +1,41 @@
 import './App.css'
 import Login from "./UserAuth/Login";
+import React, { useMemo, useState,useEffect } from "react";
 import { Routes, Route,  } from 'react-router-dom';
 import 'animate.css';
 import Register from './UserAuth/Register';
 import Confirmemail from './UserAuth/Confirmemail';
-import Home from './Dashboard/Home';
+import Home from './Dashboard/Students/Home';
 import Personal from './UserAuth/Personal';
 import Company from './Add info/Employer/Company';
 import Guardian from './Add info/Student/Guardian';
 import Education from './Add info/Student/Education';
+import Verify from './UserAuth/Verify';
+import UserContext from './api/context/context';
+import SDashboard from './Dashboard/Students/SDashboard';
 
 
 function App() {
+  const [user,setUser] = useState({
+    usertype: null,
+    id : null,
+    email: null,
+    access: null
+})
+
+useEffect(() => {
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+}, []);
+
+useEffect(() => {
+  localStorage.setItem('user', JSON.stringify(user));
+}, [user]);
+
+const providervalue = useMemo(()=>({user,setUser}),[user,setUser])
+
   return (
     <div>
       
@@ -30,18 +54,20 @@ function App() {
     </svg>
 </div>
     <div>
+    <UserContext.Provider value={providervalue}>
     <Routes>
-        <Route index element={<Login />} />
-        <Route path="register" element={<Register/>} />
+       <Route index element={<SDashboard/>} /> 
+         <Route path="register" element={<Register/>} /> 
         <Route path="confirmemail" element={<Confirmemail/>} />
-        <Route path="home" element={<Home/>} />
+        <Route path="home" element={<Login/>} />
         <Route path="personal" element={<Personal/>} />
         <Route path="Ecompany" element={<Company/>} />
         <Route path="Sguardian" element={<Guardian/>} />
         <Route path="Seducation" element={<Education/>} />
-        
+        <Route path="/activation/:uid/:token" element={<Verify/>} />
+       
       </Routes>
-  
+    </UserContext.Provider>
   
    </div>
    

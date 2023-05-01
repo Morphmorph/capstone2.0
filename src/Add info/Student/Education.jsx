@@ -5,6 +5,8 @@ import 'animate.css'
 import { PropagateLoader} from "react-spinners";
 import { useForm } from 'react-hook-form'
 import MenuItem from '@mui/material/MenuItem';
+import UserContext from "../../api/context/context";
+import { axiosRequest } from "../../api/api/axios";
 
 
 export default function Education () {
@@ -13,17 +15,31 @@ export default function Education () {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirect, setIsRedirect] = useState(false);
+  const { user } = React.useContext(UserContext);
   
   
   const handleSelectChange = (event) => {
     
-    setValue('yearlvl', event.target.value);
-    clearErrors('yearlvl'); 
+    setValue('year_level', event.target.value);
+    clearErrors('year_level'); 
   };
 
   const onSubmit = async (data, event) => {
     event.preventDefault(); 
-   
+    var Data ={
+      sch_name:data.sch_name,
+      sch_address:data.address,
+      course:data.course,
+      year_level:data.year_level,
+      user: user.id
+     };
+
+     var headers = {
+       headers: {
+         'Content-Type': 'application/json',
+         'Authorization': `JWT ${ user.access}`,
+       }
+     };
     console.log(data);
     setIsLoading(true); // Set isLoading to true when form is submitted
     try {
@@ -33,7 +49,15 @@ export default function Education () {
       await new Promise(resolve => setTimeout(resolve, 3000));
       setIsRedirect(true);
        // Set redirect state to true after form submission is successful
-       navigate('/home');
+       navigate('/Sguardian');
+
+       axiosRequest.post('auth/education/', JSON.stringify(Data), headers)  
+       .then((response) => {
+         console.log(response.data);
+          navigate('/home')
+       }).catch((err)=>{
+         alert(err.status)
+       })
     } catch (error) {
       console.error(error);
     } finally {
@@ -63,12 +87,12 @@ export default function Education () {
       
       <div className='pb-5 w-full'>
           <TextField 
-            id="sname" 
+            id="sch_name" 
             label="School name" 
             variant="outlined" 
             fullWidth
-            name="sname"
-            {...register('sname', {
+            name="sch_name"
+            {...register('sch_name', {
               required: 'This field is required',
               maxLength: {
                 value: 60,
@@ -84,8 +108,8 @@ export default function Education () {
               },
              
             })}
-            error={!!errors.sname} // Set error state based on validation result
-            helperText={errors.sname ? errors.sname.message : null} // Display validation error message
+            error={!!errors.sch_name} // Set error state based on validation result
+            helperText={errors.sch_name ? errors.sch_name.message : null} // Display validation error message
           
 
         /> 
@@ -121,113 +145,41 @@ export default function Education () {
         </div>
         <div className='pb-5 w-full'>
         <TextField
-        id="yearlvl"
+        id="year_level"
         label="Year & level"
-        name="yearlvl"
+        name="year_level"
         select 
         fullWidth
-        {...register('yearlvl', {
+        {...register('year_level', {
           required: 'This field is required!',
         })}
-        error={!!errors.yearlvl} // Set error state based on validation result
-        helperText={errors.yearlvl && errors.yearlvl.message} // Display validation error message
+        error={!!errors.year_level} // Set error state based on validation result
+        helperText={errors.year_level && errors.year_level.message} // Display validation error message
         onChange={handleSelectChange}
       >
-        <MenuItem value="1">1ST YEAR COLLEGE</MenuItem>
-        <MenuItem value="2">2ND YEAR COLLEGE</MenuItem>
-        <MenuItem value="3">3RD YEAR COLLEGE</MenuItem>
-        <MenuItem value="4">4TH YEAR COLLEGE</MenuItem>
-        <MenuItem value="5">5TH YEAR COLLEGE</MenuItem>
+        <MenuItem value="1ST YEAR COLLEGE">1ST YEAR COLLEGE</MenuItem>
+        <MenuItem value="2ND YEAR COLLEGE">2ND YEAR COLLEGE</MenuItem>
+        <MenuItem value="3RD YEAR COLLEGE">3RD YEAR COLLEGE</MenuItem>
+        <MenuItem value="4TH YEAR COLLEGE">4TH YEAR COLLEGE</MenuItem>
+        <MenuItem value="5TH YEAR COLLEGE">5TH YEAR COLLEGE</MenuItem>
       </TextField>
        
 
         </div>
         <div className='pb-5 w-full'>
         <TextField
-        id="street"
-        label="Street"
+        id="address"
+        label="Complete Address"
         variant="outlined"
         fullWidth
-        name="street"
-        {...register('street',{
-          required: 'School address is required',
-          maxLength: {
-            value: 20,
-            message: 'Exceeded the limit!',
-          },
-          pattern: {
-            value: /^[^0-9]*$/,
-            message: 'Please provide a valid street (letters only)', // Custom error message for invalid email format
-          },
+        name="address"
+        {...register('address',{
+          required: 'School address is required'
         })}
-        error={!!errors.street}
-        helperText={errors.street ? errors.street.message : null}
+        error={!!errors.address}
+        helperText={errors.address ? errors.address.message : null}
       />
       </div>
-      <div className='pb-5 w-full'>
-      <TextField
-        id="city"
-        label="City"
-        variant="outlined"
-        fullWidth
-        name="city"
-        {...register('city',{
-          required: 'School address is required',
-          maxLength: {
-            value: 30,
-            message: 'Exceeded the limit!',
-          },
-          pattern: {
-            value: /^[^0-9]*$/,
-            message: 'Please provide a valid city (letters only)', // Custom error message for invalid email format
-          },
-        })}
-        error={!!errors.city}
-        helperText={errors.city ? errors.city.message : null}
-      />
-      </div>
-      <div className='pb-5 w-full'>
-      <TextField
-        id="province"
-        label="Province"
-        variant="outlined"
-        fullWidth
-        name="province"
-        {...register('province',{
-          required: 'School address is required',
-          maxLength: {
-            value: 30,
-            message: 'Exceeded the limit!',
-          },
-          pattern: {
-            value: /^[^0-9]*$/,
-            message: 'Please provide a valid province (letters only)', // Custom error message for invalid email format
-          },
-        })}
-        error={!!errors.province}
-        helperText={errors.province ? errors.province.message : null}
-      />
-      </div>
-      <div className='pb-5 w-full'>
-      <TextField
-        id="zipcode"
-        label="Zipcode"
-        variant="outlined"
-        fullWidth
-        name="zipcode"
-        {...register('zipcode',{
-          required: 'School address is required',
-          pattern: {
-            value: /^[0-9]{4}$/,
-            message: 'Please provide a valid zipcode (digits only)',
-          },
-        })}
-        error={!!errors.zipcode}
-        helperText={errors.zipcode ? errors.zipcode.message : null}
-      />
-       
-       
-        </div>
       
       </div>
       <div className=" pt-5">

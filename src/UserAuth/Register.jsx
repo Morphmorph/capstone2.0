@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { axiosRequest } from "../api/api/axios";
 
 export default function Register () {
   const { register, handleSubmit, setValue, clearErrors, formState: { errors }, watch} = useForm();
@@ -24,21 +25,39 @@ export default function Register () {
  
   const handleSelectChange = (event) => {
     
-    setValue('userType', event.target.value);
-    clearErrors('userType'); 
+    setValue('usertype', event.target.value);
+    clearErrors('usertype'); 
   };
   const onSubmit = async (data, event) => {
     event.preventDefault(); 
-    console.log(data);
+    console.log(data.usertype);
+
+    var Data = {
+      usertype : data.usertype,
+      email : data.email,
+      password : data.password
+    }
+
     setIsLoading(true); // Set isLoading to true when form is submitted
     try {
       // Perform form submission logic here
-      console.log(data);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      console.log(Data);
+     await axiosRequest.post('auth/api/users/',JSON.stringify(Data),{ headers: {
+        'Content-Type': 'application/json'
+      }}).then((response)=>{
+        console.log(response.status);
+         // Simulate API call
+       new Promise(resolve => setTimeout(resolve, 5000));
       setIsRedirect(true);
        // Set redirect state to true after form submission is successful
        navigate('/confirmemail');
+        // setAlert(current => !current)
+       }).catch((err)=>{
+        alert("Something Went Wrong Account May Already Exist!")
+        // setError(current =>!current)
+  
+       })
+     
     } catch (error) {
       console.error(error);
     } finally {
@@ -95,16 +114,16 @@ export default function Register () {
       <div className=' w-full esm:px-0 px-5 '>
       <div className='pt-5'>
       <TextField
-        id="userType"
+        id="usertype"
         label="User type"
-        name="userType"
+        name="usertype"
         select 
         fullWidth
-        {...register('userType', {
+        {...register('usertype', {
           required: 'This field is required!',
         })}
-        error={!!errors.userType} // Set error state based on validation result
-        helperText={errors.userType && errors.userType.message} // Display validation error message
+        error={!!errors.usertype} // Set error state based on validation result
+        helperText={errors.usertype && errors.usertype.message} // Display validation error message
         onChange={handleSelectChange}
       >
         <MenuItem value="Student">Student</MenuItem>
