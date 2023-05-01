@@ -5,15 +5,16 @@ import {RiUserLocationLine, RiUser3Line, RiBuilding2Line} from 'react-icons/ri'
 import {MdWorkOutline} from 'react-icons/md'
 import {AiOutlineClockCircle} from 'react-icons/ai'
 
-export default function Home() {
+export default function Home(props) {
   return (
-    <div className='border-2 justify-center items-center bg-cover bg-center absolute px-2 py-2 rounded-lg flex flex-col'style={{ backgroundImage: `url(${cardImage})` }}>
+    <div className='border-2 justify-center items-center bg-cover bg-center absolute px-2 py-2 rounded-lg flex flex-col'style={{ backgroundImage: `url(${cardImage})`,display : props.hide }}>
       <div className="bg-cover inset-0 flex " style={{ backgroundImage: `url(${compImage})`, 
         margin: '2%', 
         width: 100, 
         height: 100, 
         borderRadius: 50,
         alignSelf: 'center',
+        
         }}>
         </div>
         <div className=' h-40 w-72 border-grey border-2 rounded-lg bg-[#F7FAFF66] '>

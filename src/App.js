@@ -11,6 +11,7 @@ import Company from './Add info/Employer/Company';
 import Guardian from './Add info/Student/Guardian';
 import Education from './Add info/Student/Education';
 import Verify from './UserAuth/Verify';
+import Bookmark from './Dashboard/Students/Bookmark'
 import UserContext from './api/context/context';
 import SDashboard from './Dashboard/Students/SDashboard';
 
@@ -20,7 +21,10 @@ function App() {
     usertype: null,
     id : null,
     email: null,
-    access: null
+    access: null,
+})
+const [page,setPage] = useState({
+  active : "Home"
 })
 
 useEffect(() => {
@@ -34,7 +38,7 @@ useEffect(() => {
   localStorage.setItem('user', JSON.stringify(user));
 }, [user]);
 
-const providervalue = useMemo(()=>({user,setUser}),[user,setUser])
+const providervalue = useMemo(() => ({ user, setUser, page, setPage }), [user, setUser, page, setPage]);
 
   return (
     <div>
@@ -64,6 +68,7 @@ const providervalue = useMemo(()=>({user,setUser}),[user,setUser])
         <Route path="Ecompany" element={<Company/>} />
         <Route path="Sguardian" element={<Guardian/>} />
         <Route path="Seducation" element={<Education/>} />
+        <Route path="Bookmarks" element={<Bookmark/>} />
         <Route path="/activation/:uid/:token" element={<Verify/>} />
        
       </Routes>

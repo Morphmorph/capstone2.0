@@ -13,14 +13,20 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import profileImage from '../Images/profile.png'
+import { Navigate, useNavigate } from 'react-router-dom';
+import UserContext from '../api/context/context';
 const pages = ['Home', 'Bookmarks', 'Activity log',];
 const settings = ['Profile', 'Account', 'Logout'];
+
 
 function Appbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [activePage, setActivePage] = React.useState(pages[0]);
+  const {setPage} = React.useContext(UserContext);
+  const {page} = React.useContext(UserContext);
 
+  const navigate = useNavigate();
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -37,8 +43,15 @@ function Appbar() {
   };
 
   const handlePageClick = (page) => {
-    setActivePage(page);
+    setActivePage(page)
+    next(page)
+    
   };
+
+const next  = (page) => {
+  setPage({active:page})
+  // console.log(page)
+}
 
   return (
     <AppBar position="absolute" style={{backgroundColor: '#1e1e1e', display: 'flex', zIndex: 1, }}>
@@ -94,7 +107,9 @@ function Appbar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handlePageClick(page)}>
+                <MenuItem key={page} onClick={() => {handlePageClick(page)
+                  // setUser({page:page})
+                }}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -108,7 +123,9 @@ function Appbar() {
               <Button
               key={page}
               color={activePage === page ? 'secondary' : 'inherit'}
-              onClick={() => handlePageClick(page)}
+              onClick={() => {handlePageClick(page)
+              
+              }}
               sx={{
                 my: 1,
                 color: 'white',
